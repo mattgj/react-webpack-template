@@ -1,11 +1,15 @@
-var webpack = require('webpack');
-var path = require('path');
-var HtmlPlugin = require('html-webpack-plugin');
+var webpack = require('webpack'),
+    path = require('path'),
+    fs = require('fs'),
+    ejs = require('ejs'),
+    HtmlWebpackPlugin = require('html-webpack-plugin')
 
-var ROOT_PATH = path.resolve(__dirname);
-var APP_PATH = path.resolve(ROOT_PATH, 'app');
-var BUILD_PATH = path.resolve(ROOT_PATH, 'build');
-var TARGET = process.env.npm_lifecycle_event;
+var ROOT_PATH = path.resolve(__dirname),
+    APP_PATH = path.resolve(ROOT_PATH, 'app'),
+    BUILD_PATH = path.resolve(ROOT_PATH, 'build'),
+    TARGET = process.env.npm_lifecycle_event;
+
+var template = ejs.compile(fs.readFileSync(path.resolve(ROOT_PATH, 'views/main.ejs'), 'utf8'));
 
 process.env.BABEL_ENV = TARGET;
 
@@ -23,9 +27,6 @@ var config = {
         hot: true,
         inline: true,
         progress: true,
-
-        // parse host and port from env so this is easy
-        // to customize
         host: process.env.HOST || "localhost",
         port: process.env.PORT || 8080
     },
@@ -42,8 +43,8 @@ var config = {
     },
     plugins: [
         new webpack.HotModuleReplacementPlugin(),
-        new HtmlPlugin({
-            title: 'My App'
+        new HtmlWebpackPlugin({
+            templateContent: template(),
         })
     ]
 };
